@@ -58,22 +58,20 @@ module "vpc" {
 # ---------------------------------------
 resource "aws_security_group" "ec2" {
   name = "lab1-firewalls"
-}
 
-resource "aws_security_group_egress_rule" "http" {
-  security_group_id = aws_security_group.ec2.id
+  vpc_id = module.vpc.vpc_id
 
-  from_port   = "80"
-  ip_protocol = "tcp"
-  to_port     = "80"
-}
+  ingress {
+    from_port = "80"
+    to_port   = "80"
+    protocol  = "tcp"
+  }
 
-resource "aws_security_group_ingress_rule" "http" {
-  security_group_id = aws_security_group.ec2.id
-
-  from_port   = "80"
-  ip_protocol = "tcp"
-  to_port     = "80"
+  egress {
+    from_port = "80"
+    to_port   = "80"
+    protocol  = "tcp"
+  }
 }
 
 
@@ -87,7 +85,7 @@ resource "tls_private_key" "ssh" {
 
 resource "aws_key_pair" "ssh" {
   key_name   = "ec2-Lab1"
-  public_key = tls_private_key.example.public_key_openssh
+  public_key = tls_private_key.ssh.public_key_openssh
 }
 
 
