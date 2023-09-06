@@ -2,34 +2,17 @@
 # Class: AIT 665 - Cloud Computing
 # Author: Christopher Wagner
 
+# ---------------------------------------
+# DEFINE PROVIDER CONIGURATION W/ REGION
+# ---------------------------------------
 provider "aws" {
   region = "us-east-1"
 }
 
 
-# An Amazon Machine Image (AMI) is a supported and 
-# maintained image provided by AWS that provides the 
-# information required to launch an instance.
-#
-# An AMI can be selected based on many criteria.
-# The AMI can be selected based on the operating system,
-# virtualization type, architecture, and storage for example.
-# A full list of criteria can be found at the following link:
-# https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-images.html
-#
-# I chose the Amazon Linux 2 AMI because it was built specifically
-# for running on AWS Cloud. In many ways it is optimized for security
-# and performance. It is also free tier eligible.
-#
-# Under the Quickstart tab, there are three options for where to find AMIs:
-#
-# My AMIs is a list of AMIs that you have created or have been shared with you.
-#
-# AWS Marketplace is a list of AMIs that have been created by third parties
-# that are verified by AWS.
-#
-# Community AMIs is a list of AMIs that are available for use that have been
-# released for public use. These AMIs are not nessecarily verified by AWS.
+# ---------------------------------------
+# GET THE AMI ID FOR AMAZON LINUX 2
+# ---------------------------------------
 data "aws_ami" "amzn2" {
   most_recent = true
 
@@ -51,6 +34,10 @@ data "aws_ami" "amzn2" {
   }
 }
 
+
+# ---------------------------------------
+# CREATE A VPC TO DEPLOY THE EC2 INSTANCE
+# ---------------------------------------
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "3.19.0"
@@ -66,11 +53,9 @@ module "vpc" {
 }
 
 
-# A security group acts as a virtual firewall for your 
-# instance to control inbound (ingress) and outbound (egress) 
-# traffic. A security group is stateful, meaning if you allow
-# inbound traffic, return traffic is automatically allowed and
-# vice versa.
+# ---------------------------------------
+# CREATE A SECURITY GROUP FOR THE INSTANCE
+# ---------------------------------------
 resource "aws_security_group" "ec2" {
   name = "lab1-firewalls"
 }
@@ -91,12 +76,10 @@ resource "aws_security_group_ingress_rule" "http" {
   to_port     = "80"
 }
 
-# SSH Key
 
-# A key pair is created an used to connect to the EC2 instance.
-# If you lose the key pair, you will not be able to connect to
-# the EC2 instance with SSH. However, there is an alternative
-# method to connect to the EC2 instance through the AWS console.
+# ---------------------------------------
+# CREATE A KEY PAIR FOR THE INSTANCE
+# ---------------------------------------
 resource "tls_private_key" "ssh" {
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -107,8 +90,10 @@ resource "aws_key_pair" "ssh" {
   public_key = tls_private_key.example.public_key_openssh
 }
 
-# IAM Instance Profile
 
+# ---------------------------------------
+# CREATE AN IAM ROLE FOR THE INSTANCE
+# ---------------------------------------
 resource "aws_iam_instance_profile" "ec2" {
   name = "ec2-Lab1"
 
@@ -137,20 +122,13 @@ resource "aws_iam_role_policy_attachment" "ec2" {
   policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
-# EC2 Instance
 
+# ---------------------------------------
+# CREATE THE EC2 INSTANCE
+# ---------------------------------------
 resource "aws_instance" "ec2" {
   ami = data.aws_ami.amzn2.id
 
-  # The different instance types represent different combinations of 
-  # CPU, memory, storage, and networking capacity. Each instance type
-  # includes one or more instance sizes, allowing you to scale your
-  # resources to the requirements of your target workload.
-  #
-  # Additionally, the instance types are grouped into families based
-  # on their general purpose. For example, the t2 family is designed
-  # for general purpose computing, while the c5 family is designed
-  # for compute-intensive workloads.
   instance_type = "t2.micro"
 
   iam_instance_profile = aws_iam_instance_profile.ec2.name
