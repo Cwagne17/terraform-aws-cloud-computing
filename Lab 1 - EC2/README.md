@@ -47,6 +47,8 @@ The different instance types represent different combinations of CPU, memory, st
 
 ## Question 7
 
+Tags are used to identify resources. They can be used to identify resources for billing purposes, or to identify resources for automation purposes. In the case of this Name tag, it is used to identify the EC2 instance in the AWS console.
+
 ## Question 8
 
 A security group acts as a virtual firewall for your instance to control inbound (ingress) and outbound (egress) traffic. A security group is stateful, meaning if you allow inbound traffic, return traffic is automatically allowed and vice versa.

@@ -145,11 +145,6 @@ resource "aws_instance" "ec2" {
     delete_on_termination = true
   }
 
-  # Tags are used to identify resources. They can be used to
-  # identify resources for billing purposes, or to identify
-  # resources for automation purposes. In the case of this 
-  # Name tag, it is used to identify the EC2 instance in the
-  # AWS console.
   tags = {
     Name = "ec2-Lab1"
   }
