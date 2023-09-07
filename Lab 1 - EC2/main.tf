@@ -67,6 +67,12 @@ resource "aws_security_group" "ec2" {
     protocol  = "tcp"
   }
 
+  ingress {
+    from_port = "22"
+    to_port   = "22"
+    protocol  = "tcp"
+  }
+
   egress {
     from_port = "80"
     to_port   = "80"
@@ -86,6 +92,13 @@ resource "tls_private_key" "ssh" {
 resource "aws_key_pair" "ssh" {
   key_name   = "ec2-Lab1"
   public_key = tls_private_key.ssh.public_key_openssh
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      echo '${tls_private_key.ssh.private_key_pem}' > ec2-Lab1.pem
+      chmod 400 ./ec2-Lab1.pem
+    EOT
+  }
 }
 
 
@@ -146,4 +159,6 @@ resource "aws_instance" "ec2" {
   tags = {
     Name = "ec2-Lab1"
   }
+
+  depends_on = [aws_security_group.ec2]
 }
