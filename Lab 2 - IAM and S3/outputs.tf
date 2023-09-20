@@ -10,5 +10,5 @@ output "iam_user_password" {
 
 output "aws_console_url" {
   description = "URL to AWS Sign-in Console"
-  value       = "https://${data.aws_partition.current.partition}.signin.aws.amazon.com/console/"
+  value       = "https://${data.aws_caller_identity.current.id}.signin.aws.amazon.com/console/"
 }
